@@ -1,0 +1,26 @@
+
+GOPATH:=$(shell go env GOPATH)
+.PHONY: init
+init:
+	go install google.golang.org/protobuf/cmd/protoc-gen-go
+	go install micro.dev/v4/cmd/protoc-gen-micro
+
+.PHONY: api
+api:
+	protoc --openapi_out=. --proto_path=. proto/server.proto
+
+.PHONY: proto
+proto:
+	protoc --proto_path=. --micro_out=. --go_out=:. proto/server.proto
+	
+.PHONY: build
+build:
+	go build -o server *.go
+
+.PHONY: test
+test:
+	go test -v ./... -cover
+
+.PHONY: docker
+docker:
+	docker build . -t server:latest
